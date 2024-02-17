@@ -15,22 +15,41 @@ class Map(lines: List<String>) {
             }
     }
 
-    operator fun get(x: Int, y: Int): Cell {
-        return cells[y][x]
+    val components = partNumbers.filter { getSymbol(it) != null }
+
+    operator fun get(x: Int, y: Int): Cell? {
+        return if (y in cells.indices && x in cells[y].indices) cells[y][x]
+        else null
     }
 
-    fun isAdjacent(partNumber: PartNumber): Boolean {
-        return partNumber.coords.any { (x: Int, y: Int) ->
-            listOf(
-                this[x - 1, y - 1],
-                this[x - 1, y + 1],
-                this[x, y - 1],
-                this[x - 1, y],
-                this[x + 1, y],
-                this[x, y + 1],
-                this[x + 1, y + 1],
-                this[x + 1, y - 1]
-            ).any { cell -> cell.type == TypeEnum.COMPONENT }
+    private fun getSymbol(partNumber: PartNumber): Symbol? {
+        return partNumber.coords.flatMap { (x: Int, y: Int) ->
+            listOfNotNull(
+                Point(x - 1, y - 1),
+                Point(x - 1, y + 1),
+                Point(x, y - 1),
+                Point(x - 1, y),
+                Point(x + 1, y),
+                Point(x, y + 1),
+                Point(x + 1, y + 1),
+                Point(x + 1, y - 1),
+            )
         }
+            .find { (x: Int, y: Int) -> this[x, y]?.type == TypeEnum.COMPONENT }
+            ?.let { (x: Int, y: Int) -> Symbol(this[x, y]!!, Point(x, y), partNumber) }
+    }
+
+    fun getGears(): List<Gear> {
+        return partNumbers.mapNotNull(::getSymbol)
+            .filter { it.symbol.value == '*' }
+            .also { println(it) }
+            .groupBy(Symbol::point)
+            .filterValues { symbols -> symbols.size == 2 }
+            .map { (point: Point, symbols: List<Symbol>) ->
+                Gear(
+                    point,
+                    symbols[0].partNumber.value * symbols[1].partNumber.value
+                )
+            }
     }
 }
