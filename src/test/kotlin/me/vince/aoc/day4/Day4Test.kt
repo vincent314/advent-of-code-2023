@@ -18,6 +18,7 @@ class Day4Test {
         val card = Day4.parseCard("Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53")
         assertEquals(
             Card(
+                id=1,
                 winnings = listOf(41, 48, 83, 86, 17),
                 numbers = listOf(83, 86, 6, 31, 17, 9, 48, 53)
             ), card
@@ -47,5 +48,19 @@ class Day4Test {
         val cards = readInput()
         val total = Day4.total(cards)
         assertEquals(23028, total)
+    }
+
+    @Test
+    fun `should count nodes sample`(){
+        val cards = Day4.buildTree(sample)
+        val count = Day4.countNodes(cards)
+        assertEquals(30, count)
+    }
+
+    @Test
+    fun `should count nodes part2`() {
+        val cards = Day4.buildTree(readInput())
+        val count = Day4.countNodes(cards)
+        assertEquals(9236992,count)
     }
 }
