@@ -2,8 +2,6 @@ package me.vince.aoc.day5
 
 import me.vince.aoc.day5.Day5.MapTypeEnum.*
 
-typealias RangeMap = Pair<LongRange, LongRange>
-
 object Day5 {
 
     enum class MapTypeEnum {
@@ -18,7 +16,10 @@ object Day5 {
             .split(' ')
             .map(String::toLong)
 
-        val almanac = Almanac(seeds = seeds)
+        val seedRange = (seeds.indices.first..<seeds.indices.last step 2)
+            .map { seeds[it]..<(seeds[it] + seeds[it + 1]) }
+
+        val almanac = Almanac(seeds = seeds, seedRange = seedRange)
 
         var currentType: MapTypeEnum? = null
         for (line in lines.drop(1)) {
@@ -44,7 +45,7 @@ object Day5 {
                         s..<s + l,
                     )
                 }
-                ?.also { rangeMap ->
+                ?.also { rangeMap: RangeMap ->
                     when (currentType) {
                         SEED_TO_SOIL -> almanac.seedToSoilList += rangeMap
                         SOIL_TO_FERTILIZER -> almanac.soilToFertilizer += rangeMap

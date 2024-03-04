@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import kotlin.test.Ignore
 import kotlin.time.measureTimedValue
 
 class Day5Test {
@@ -58,21 +57,21 @@ class Day5Test {
 
         assertEquals(
             listOf(
-                50L..<52L to 98L..<100L,
-                52L..<100L to 50L..<98L,
+                RangeMap(50L..<52L, 98L..<100L),
+                RangeMap(52L..<100L, 50L..<98L),
             ), sampleAlmanac.seedToSoilList
         )
         assertEquals(
             listOf(
-                0L..<37L to 15L..<52L,
-                37L..<39L to 52L..<54L,
-                39L..<54L to 0L..<15L
+                RangeMap(0L..<37L, 15L..<52L),
+                RangeMap(37L..<39L, 52L..<54L),
+                RangeMap(39L..<54L, 0L..<15L),
             ), sampleAlmanac.soilToFertilizer
         )
         assertEquals(
             listOf(
-                60L..<97L to 56L..<93L,
-                56L..<60L to 93L..<97L,
+                RangeMap(60L..<97L, 56L..<93L),
+                RangeMap(56L..<60L, 93L..<97L),
             ), sampleAlmanac.humidityToLocation
         )
     }
@@ -119,11 +118,20 @@ class Day5Test {
     fun `resolve part1 find lowest target`() {
         val almanac = readInput()
 
-        val (result, duration)=measureTimedValue {
+        val (result, duration) = measureTimedValue {
             almanac.lowestLocation
         }
         assertEquals(84470622L, result)
 
         println("Total duration : $duration")
+    }
+
+    @Test
+    fun `resolve part2`() {
+        val almanac = readInput()
+
+        val result = almanac.lowestLocationRange
+
+        assertEquals(26714516L, result)
     }
 }

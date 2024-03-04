@@ -3,20 +3,15 @@ package me.vince.aoc.day5
 import kotlin.time.measureTimedValue
 
 fun List<RangeMap>.findTarget(source: Long): Long {
-    val (value, duration) = measureTimedValue {
-        firstOrNull { (_, sources) -> source in sources }
-            ?.let { (destination, sources) ->
-                val idx = sources.indexOf(source)
-                destination.elementAt(idx)
-            }
-            ?: source
-    }
-    println("findTarget $source : $duration")
+    val value = firstOrNull { (_, sources) -> source in sources }
+        ?.getConnection(source)
+        ?: source
     return value
 }
 
 class Almanac(
     val seeds: List<Long>,
+    val seedRange: List<LongRange>,
     val seedToSoilList: MutableList<RangeMap> = mutableListOf(),
     val soilToFertilizer: MutableList<RangeMap> = mutableListOf(),
     val fertilizerToWater: MutableList<RangeMap> = mutableListOf(),
@@ -37,4 +32,13 @@ class Almanac(
 
     val lowestLocation: Long
         get() = seeds.minOf(::process)
+
+    val lowestLocationRange: Long
+        get() = seedRange.minOf { range ->
+            val (min, duration) = measureTimedValue {
+                range.minOf(::process)
+            }
+            println("Range ${range.first} - ${range.last} : $duration")
+            min
+        }
 }
