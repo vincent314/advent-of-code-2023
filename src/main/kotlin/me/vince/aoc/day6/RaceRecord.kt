@@ -9,29 +9,28 @@ data class RaceRecord(val time: Long, val distance: Long) {
             computeDistance(t) > distance
         }.toLong()
 
-    fun findDicotomy(searchUpper: Boolean, lowerBound: Long = 0, upperBound: Long = time): Long {
+    fun findDicotomy(lowerBound: Long = 0, upperBound: Long = time, predicate: (time: Long) -> Boolean): Long {
         val halfTime = (lowerBound + upperBound) / 2
         val lbd = computeDistance(lowerBound)
         val ubd = computeDistance(upperBound)
         val htd = computeDistance(halfTime)
 
         if (upperBound - lowerBound <= 1) {
-            return if (searchUpper) upperBound else lowerBound
+            return if (predicate(ubd)) upperBound else lowerBound
         }
 
         return when {
-            lbd == distance -> if (searchUpper) lbd + 1 else lbd - 1
-            ubd == distance -> if (searchUpper) ubd + 1 else ubd - 1
-            htd == distance -> if (searchUpper) htd + 1 else htd - 1
-            searchUpper && htd > distance -> findDicotomy(searchUpper, lowerBound, halfTime)
-            !searchUpper && htd < distance -> findDicotomy(searchUpper, lowerBound, halfTime)
-            else -> findDicotomy(searchUpper, halfTime, upperBound)
+            lbd == distance -> return upperBound
+            ubd == distance -> return lowerBound
+            htd == distance -> if (lbd > ubd) lowerBound else upperBound
+            htd < distance && lbd < distance -> findDicotomy(halfTime, upperBound, predicate)
+            htd < distance && lbd > distance -> findDicotomy()
         }
     }
 
     fun countFasterPossibilities(): Long {
-        val lower = findDicotomy(true)
-        val higher = findDicotomy(false)
+        val lower = findDicotomy { it > distance }
+        val higher = findDicotomy { it < distance }
         println("$lower=${computeDistance(lower)} - $higher=${computeDistance((higher))}")
         return higher - lower
         //333163512891532
