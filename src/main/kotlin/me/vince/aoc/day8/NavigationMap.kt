@@ -1,6 +1,7 @@
 package me.vince.aoc.day8
 
 import me.vince.aoc.day8.Instruction.*
+import me.vince.aoc.lcm
 
 enum class Instruction {
     LEFT, RIGHT;
@@ -15,6 +16,9 @@ enum class Instruction {
 }
 
 data class Node(val value: String, var left: Node?, var right: Node?) {
+    val isStart = value.endsWith('A')
+    val isEnd = value.endsWith('Z')
+
     override fun toString(): String {
         return "$value : (${left?.value}, ${right?.value})"
     }
@@ -30,9 +34,16 @@ data class Node(val value: String, var left: Node?, var right: Node?) {
         result = 31 * result + (right?.hashCode() ?: 0)
         return result
     }
+
+    fun next(step: Instruction): Node {
+        return when (step) {
+            LEFT -> left!!
+            RIGHT -> right!!
+        }
+    }
 }
 
-class NavigationMap(val instructions: List<Instruction>, val root: Node) {
+class NavigationMap(val instructions: List<Instruction>, val roots: List<Node>) {
 
     companion object {
         private val lineRegex = Regex("""(\w{3}) = \((\w{3}), (\w{3})\)""")
@@ -44,7 +55,9 @@ class NavigationMap(val instructions: List<Instruction>, val root: Node) {
 
             val nodeMap = parseNodes(input.lines().drop(1).filterNot(String::isBlank))
 
-            return NavigationMap(instructions, requireNotNull(nodeMap["AAA"]))
+            val roots = nodeMap.values.filter(Node::isStart)
+
+            return NavigationMap(instructions, roots)
         }
 
         private fun parseNodes(lines: List<String>): Map<String, Node> {
@@ -68,25 +81,27 @@ class NavigationMap(val instructions: List<Instruction>, val root: Node) {
 
             return nodes
         }
+
     }
 
-    fun reachEnd(): Int {
-        var current: Node? = root
-        var i = 0
-        var moveNumber = 0
-
-        while (current?.value != "ZZZ") {
-            if (i !in instructions.indices) {
-                i = 0
+    fun reachEnd(): Long {
+        val moveCounts = roots.map { rootNode ->
+            var currentNode = rootNode
+            val instructionIterator = instructionSequence(instructions).iterator()
+            var moveCounter = 0L
+            while(!currentNode.isEnd) {
+                val instruction = instructionIterator.next()
+                currentNode = currentNode.next(instruction)
+                moveCounter++
             }
-            val instruction = instructions[i]
-            current = when (instruction) {
-                LEFT -> current?.left
-                RIGHT -> current?.right
-            }
-            i++
-            moveNumber++
+            moveCounter
         }
-        return moveNumber
+        return lcm(*moveCounts.toLongArray())
+    }
+
+    private fun instructionSequence(instructions: List<Instruction>) = sequence {
+        while (true) {
+            instructions.forEach { yield(it) }
+        }
     }
 }
