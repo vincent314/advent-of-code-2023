@@ -10,6 +10,7 @@ repositories {
 }
 
 dependencies {
+    implementation("org.assertj:assertj-core:3.26.3")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
 }

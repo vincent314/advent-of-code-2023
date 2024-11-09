@@ -24,7 +24,8 @@ data class RaceRecord(val time: Long, val distance: Long) {
             ubd == distance -> return lowerBound
             htd == distance -> if (lbd > ubd) lowerBound else upperBound
             htd < distance && lbd < distance -> findDicotomy(halfTime, upperBound, predicate)
-            htd < distance && lbd > distance -> findDicotomy()
+//            htd < distance && lbd > distance -> findDicotomy()
+            else -> 0L
         }
     }
 

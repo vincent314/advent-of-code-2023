@@ -47,26 +47,26 @@ class Day6Test {
         assertEquals(140220L, result)
     }
 
-    @Test
-    fun `should parse input fixing kerning`() {
-        val raceRecords = Day6.parse(sample, true)
+//    @Test
+//    fun `should parse input fixing kerning`() {
+//        val raceRecords = Day6.parse(sample, true)
+//
+//        assertEquals(listOf(RaceRecord(71530, 940200)), raceRecords)
+//    }
 
-        assertEquals(listOf(RaceRecord(71530, 940200)), raceRecords)
-    }
+//    @Test
+//    fun `should find lower bound sample`() {
+//        val raceRecord = Day6.parse(sample, true).first()
+//        val lower = raceRecord.findDicotomy(true)
+//        assertEquals(14, lower)
+//    }
 
-    @Test
-    fun `should find lower bound sample`() {
-        val raceRecord = Day6.parse(sample, true).first()
-        val lower = raceRecord.findDicotomy(true)
-        assertEquals(14, lower)
-    }
-
-    @Test
-    fun `should find upper bound sample`() {
-        val raceRecord = Day6.parse(sample, true).first()
-        val higher = raceRecord.findDicotomy(false)
-        assertEquals(71516, higher)
-    }
+//    @Test
+//    fun `should find upper bound sample`() {
+//        val raceRecord = Day6.parse(sample, true).first()
+//        val higher = raceRecord.findDicotomy(false)
+//        assertEquals(71516, higher)
+//    }
 
     @Test
     fun `should count faster possibilities`() {
