@@ -20,7 +20,11 @@ object Oasis {
         return values.last() + extrapolation
     }
 
-    fun analyzeHistory(data: List<List<Long>>): Long {
-        return data.sumOf(::extrapolate)
+    fun analyzeHistory(data: List<List<Long>>, backward: Boolean = false): Long {
+        return if (!backward) {
+            data.sumOf(::extrapolate)
+        } else {
+            data.map(List<Long>::reversed).sumOf(::extrapolate)
+        }
     }
 }
