@@ -15,9 +15,29 @@ enum class Instruction {
     }
 }
 
-data class Node(val value: String, var left: Node?, var right: Node?) {
-    val isStart = value.endsWith('A')
-    val isEnd = value.endsWith('Z')
+interface INodeRules {
+    fun isStart(value: String): Boolean
+    fun isEnd(value: String): Boolean
+}
+
+class NodeRulesPart1 : INodeRules {
+    override fun isStart(value: String): Boolean = value == "AAA"
+    override fun isEnd(value: String): Boolean = value == "ZZZ"
+}
+
+class NodeRulesPart2 : INodeRules {
+    override fun isStart(value: String): Boolean = value.endsWith('A')
+    override fun isEnd(value: String): Boolean = value.endsWith('Z')
+}
+
+data class Node(
+    val value: String,
+    var left: Node?,
+    var right: Node?,
+    val nodeRules: INodeRules
+) {
+    val isStart = nodeRules.isStart(value)
+    val isEnd = nodeRules.isEnd(value)
 
     override fun toString(): String {
         return "$value : (${left?.value}, ${right?.value})"
@@ -43,24 +63,27 @@ data class Node(val value: String, var left: Node?, var right: Node?) {
     }
 }
 
-class NavigationMap(val instructions: List<Instruction>, val roots: List<Node>) {
+class NavigationMap(
+    val instructions: List<Instruction>,
+    val roots: List<Node>
+) {
 
     companion object {
         private val lineRegex = Regex("""(\w{3}) = \((\w{3}), (\w{3})\)""")
 
-        fun from(input: String): NavigationMap {
+        fun from(input: String, nodeRules: INodeRules): NavigationMap {
             val instructions = input.lines()
                 .first()
                 .mapNotNull(Instruction.Companion::from)
 
-            val nodeMap = parseNodes(input.lines().drop(1).filterNot(String::isBlank))
+            val nodeMap = parseNodes(input.lines().drop(1).filterNot(String::isBlank), nodeRules)
 
             val roots = nodeMap.values.filter(Node::isStart)
 
             return NavigationMap(instructions, roots)
         }
 
-        private fun parseNodes(lines: List<String>): Map<String, Node> {
+        private fun parseNodes(lines: List<String>, nodeRules: INodeRules): Map<String, Node> {
             val nodeMap = lines.mapNotNull { line ->
                 lineRegex.matchEntire(line)?.let {
                     val (a, b, c) = it.destructured
@@ -70,7 +93,7 @@ class NavigationMap(val instructions: List<Instruction>, val roots: List<Node>) 
                 .toMap()
 
             val nodes = nodeMap.mapValues { (key, _) ->
-                Node(key, null, null)
+                Node(key, null, null, nodeRules)
             }
 
             nodeMap.forEach { (id, pair) ->
@@ -89,7 +112,7 @@ class NavigationMap(val instructions: List<Instruction>, val roots: List<Node>) 
             var currentNode = rootNode
             val instructionIterator = instructionSequence(instructions).iterator()
             var moveCounter = 0L
-            while(!currentNode.isEnd) {
+            while (!currentNode.isEnd) {
                 val instruction = instructionIterator.next()
                 currentNode = currentNode.next(instruction)
                 moveCounter++

@@ -4,7 +4,6 @@ import me.vince.aoc.TestUtil
 import me.vince.aoc.day8.Instruction.LEFT
 import me.vince.aoc.day8.Instruction.RIGHT
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class NavigationMapTest {
@@ -16,7 +15,7 @@ class NavigationMapTest {
         ZZZ = (ZZZ, ZZZ)
     """.trimIndent()
 
-    private val samplePart2= """
+    private val samplePart2 = """
         LR
 
         11A = (11B, XXX)
@@ -28,15 +27,18 @@ class NavigationMapTest {
         22Z = (22B, 22B)
         XXX = (XXX, XXX)
     """.trimIndent()
+
     @Test
     fun `should parse sample`() {
-        val navigationMap = NavigationMap.from(samplePart1)
+        val navigationMap = NavigationMap.from(samplePart1, NodeRulesPart1())
 
         assertEquals(listOf(LEFT, LEFT, RIGHT), navigationMap.instructions.asSequence().take(3).toList())
 
-        val aaa = Node("AAA", null, null)
-        val bbb = Node("BBB", null, null)
-        val zzz = Node("ZZZ", null, null)
+        val nodeRules = NodeRulesPart1()
+
+        val aaa = Node("AAA", null, null, nodeRules)
+        val bbb = Node("BBB", null, null, nodeRules)
+        val zzz = Node("ZZZ", null, null, nodeRules)
 
         with(aaa) {
             left = bbb
@@ -60,33 +62,32 @@ class NavigationMapTest {
 
     @Test
     fun `should find end of instructions`() {
-        val navigationMap = NavigationMap.from(samplePart1)
+        val navigationMap = NavigationMap.from(samplePart1, NodeRulesPart1())
         val result = navigationMap.reachEnd()
         assertEquals(6, result)
     }
 
-    @Disabled
     @Test
-    fun `should find end of puzzle input`(){
+    fun `should find end of puzzle input`() {
         val input = TestUtil.readFile("/inputs/day8.txt")
 
-        val navigationMap = NavigationMap.from(input)
+        val navigationMap = NavigationMap.from(input, NodeRulesPart1())
         val result = navigationMap.reachEnd()
         assertEquals(20093L, result)
     }
 
     @Test
-    fun `should find end of sample part 2`(){
-        val navigationMap = NavigationMap.from(samplePart2)
+    fun `should find end of sample part 2`() {
+        val navigationMap = NavigationMap.from(samplePart2, NodeRulesPart2())
         val result = navigationMap.reachEnd()
-        assertEquals(6L,result)
+        assertEquals(6L, result)
     }
 
     @Test
-    fun `should find end of puzzle input part 2`(){
+    fun `should find end of puzzle input part 2`() {
         val input = TestUtil.readFile("/inputs/day8.txt")
-        val navigationMap = NavigationMap.from(input)
+        val navigationMap = NavigationMap.from(input, NodeRulesPart2())
         val result = navigationMap.reachEnd()
-        assertEquals(22_103_062_509_257L,result)
+        assertEquals(22_103_062_509_257L, result)
     }
 }
